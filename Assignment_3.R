@@ -7,3 +7,10 @@ demo_df <- data.frame(
 )
 
 print(demo_df)
+library(ggplot2)
+
+ggplot(demo_df, aes(x = Name, y = Score, fill = Age)) +
+    geom_bar(stat = "identity") +
+    labs(title = "Scores by Name and Age", x = "Name", y = "Score") +
+    theme_minimal()
+
