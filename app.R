@@ -2,50 +2,78 @@
 # across Australia.
 
 # Load necessary libraries
-library(shiny)
+#library(shiny)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 # Load the ABS CPI data
-cpi_data <- read.csv("All groups CPI and Trimmed mean, Australia, annual movement (%).csv") # nolint
+library(shiny)
+library(bslib)
 
-nrow(cpi_data)
-# Check the structure of the data
-str(cpi_data)
-# Convert the 'Year' column to a factor
-cpi_data$Year <- as.factor(cpi_data$Year)
-# Create a Shiny app
-ui <- fluidPage(
-  titlePanel("ABS CPI Data Visualization"),
-  sidebarLayout(
-    sidebarPanel(
-      selectInput("region", "Select Region:", 
-                  choices = unique(cpi_data$Region), 
-                  selected = "Australia"),
-      selectInput("cpi_type", "Select CPI Type:", 
-                  choices = c("All groups CPI", "Trimmed mean"), 
-                  selected = "All groups CPI")
-    ),
-    mainPanel(
-      plotOutput("cpiPlot")
+# Define UI for app that draws a histogram ----
+ui <- page_sidebar(
+  # App title ----
+  title = "Hello Shiny!",
+  # Sidebar panel for inputs ----
+  sidebar = sidebar(
+    # Input: Slider for the number of bins ----
+    sliderInput(
+      inputId = "bins",
+      label = "Number of bins:",
+      min = 1,
+      max = 50,
+      value = 30
     )
-  )
+  ),
+  # Output: Histogram ----
+  plotOutput(outputId = "distPlot")
 )
+# Define server logic required to draw a histogram ----
 server <- function(input, output) {
-  output$cpiPlot <- renderPlot({
-    filtered_data <- cpi_data %>%
-      filter(Region == input$region, CPI_Type == input$cpi_type)
-    
-    ggplot(filtered_data, aes(x = Year, y = Value)) +
-      geom_line() +
-      geom_point() +
-      labs(title = paste("CPI Data for", input$region, "-", input$cpi_type),
-           x = "Year",
-           y = "CPI (%)") +
-      theme_minimal()
-  })
+
+  # Histogram of the Old Faithful Geyser Data ----
+  # with requested number of bins
+  # This expression that generates a histogram is wrapped in a call
+  # to renderPlot to indicate that:
+  #
+  # 1. It is "reactive" and therefore should be automatically
+  #    re-executed when inputs (input$bins) change
+  # 2. Its output type is a plot
+  output$distPlot <- renderPlot({
+
+    x    <- faithful$waiting
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+
+    hist(x, breaks = bins, col = "#007bc2", border = "white",
+         xlab = "Waiting time to next eruption (in mins)",
+         main = "Histogram of waiting times")
+
+    })
+
 }
-# Run the Shiny app
+# Define server logic required to draw a histogram ----
+server <- function(input, output) {
+
+  # Histogram of the Old Faithful Geyser Data ----
+  # with requested number of bins
+  # This expression that generates a histogram is wrapped in a call
+  # to renderPlot to indicate that:
+  #
+  # 1. It is "reactive" and therefore should be automatically
+  #    re-executed when inputs (input$bins) change
+  # 2. Its output type is a plot
+  output$distPlot <- renderPlot({
+
+    x    <- faithful$waiting
+    bins <- seq(min(x), max(x), length.out = input$bins + 1)
+
+    hist(x, breaks = bins, col = "#007bc2", border = "white",
+         xlab = "Waiting time to next eruption (in mins)",
+         main = "Histogram of waiting times")
+
+    })
+
+}
+library(shiny)
+
 shinyApp(ui = ui, server = server)
-# Save the app as a Shiny app
-# Note: To run this app, save the code in a file named "app.R" and run it in RStudio or any R environment that supports Shiny. # nolint
